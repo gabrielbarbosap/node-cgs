@@ -13,6 +13,8 @@ app.use((req, res, next) => {
   next();
 });
 
+const port = process.env.PORT || 3000;
+
 db.connect((err) => {
   if (err) {
     throw err;
@@ -151,6 +153,6 @@ app.post("/save-data", verifyJWT, async function (req, res) {
   });
 });
 
-app.listen("3030", () => {
+app.listen(port, () => {
   console.log("Server init");
 });
