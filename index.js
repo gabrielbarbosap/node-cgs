@@ -68,6 +68,18 @@ app.get("/all", verifyJWT, (req, res) => {
   });
 });
 
+function uniqueObj(tit) {
+  const sql = `SELECT * FROM app_cartelas_vendidas WHERE TITULO1 = ${tit}`;
+  db.connect((err) => {
+    db.query(sql, (err, results) => {
+      if (err) {
+        throw err;
+      }
+      return results;
+    });
+  });
+}
+
 app.post("/customize-select", verifyJWT, (req, res) => {
   const sql = `SELECT * FROM app_cartelas_vendidas WHERE ${req.body.header} = ${req.body.value}`;
   db.connect((err) => {
@@ -130,6 +142,8 @@ app.post("/save-data", verifyJWT, async function (req, res) {
 
   await db.connect(() => {
     console.log(body);
+    const sql = `SELECT * FROM app_cartelas_vendidas WHERE TITULO1 = ${TITULO1}`;
+
     try {
       db.query(
         `INSERT INTO app_cartelas_vendidas (ID_EMPRESA, ID_EXTRACAO, ID_TIPO, TITULO1, TITULO2, TITULO3, TITULO4, AUTORIZACAO, SELO, NOME, CELULAR, EMAIL, CPF, CEP, ENDERECO, COMPLEMENTO, BAIRRO, UF) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -141,9 +155,17 @@ app.post("/save-data", verifyJWT, async function (req, res) {
               status: 400,
             });
           }
-          res.status(200).json({
-            data: req.body,
-            status: 200,
+          db.connect((err) => {
+            db.query(sql, (err, results) => {
+              if (err) {
+                throw err;
+              }
+              res.status(200).json({
+                data: req.body,
+                status: 200,
+                token_to_save: results[0].ID + "ya0gsqhy4wzvuvb4",
+              });
+            });
           });
         }
       );
